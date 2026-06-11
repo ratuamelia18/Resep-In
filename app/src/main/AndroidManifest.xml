@@ -2,44 +2,32 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
 
     <application
+        android:name=".AppController"
         android:allowBackup="true"
         android:icon="@android:drawable/ic_menu_gallery"
         android:label="ResepIn"
         android:roundIcon="@android:drawable/ic_menu_gallery"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ResepIn">
+        android:theme="@style/Theme.ResepIn"
+        android:usesCleartextTraffic="true">
 
         <activity
             android:name=".LoginActivity"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
 
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".DetailRecipeActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".SearchActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".ui.theme.UploadRecipeActivity"
             android:exported="false" />
 
     </application>

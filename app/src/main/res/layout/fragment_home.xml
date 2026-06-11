@@ -1,86 +1,174 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FAFAFA">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:paddingBottom="32dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Resep Nusantara"
-            android:textSize="28sp"
-            android:textStyle="bold"/>
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="#212121"
+            android:layout_marginTop="24dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"/>
 
         <EditText
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Cari resep makanan"/>
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@android:drawable/edit_text"
+            android:hint="Cari resep makanan..."
+            android:paddingHorizontal="16dp"
+            android:textSize="15sp"
+            android:drawableStart="@android:drawable/ic_menu_search"
+            android:drawableLeft="@android:drawable/ic_menu_search"
+            android:drawablePadding="8dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Rekomendasi"
+            android:text="Rekomendasi Hari Ini"
             android:textStyle="bold"
-            android:textSize="20sp"
-            android:layout_marginTop="20dp"/>
+            android:textSize="18sp"
+            android:textColor="#212121"
+            android:layout_marginTop="24dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"/>
 
-        <ImageView
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:src="@drawable/rendang"
-            android:scaleType="centerCrop"/>
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="12dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/rendang"
+                    android:scaleType="centerCrop"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:layout_gravity="bottom"
+                    android:background="@android:drawable/screen_background_dark_transparent"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rendang Daging Sapi Autentik"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="bottom"
+                    android:layout_margin="16dp"/>
+            </FrameLayout>
+        </androidx.cardview.widget.CardView>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Kategori"
             android:textStyle="bold"
-            android:textSize="20sp"
-            android:layout_marginTop="20dp"/>
+            android:textSize="18sp"
+            android:textColor="#212121"
+            android:layout_marginTop="24dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"/>
 
-        <LinearLayout
+        <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:scrollbars="none"
+            android:layout_marginTop="12dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:clipToPadding="false">
 
-            <Button
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Nasi"/>
+                android:orientation="horizontal">
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ayam"/>
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="38dp"
+                    android:text="Semua"
+                    android:textSize="13sp"
+                    android:textAllCaps="false"
+                    android:background="@android:drawable/btn_default"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"/>
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Dessert"/>
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="38dp"
+                    android:text="Nasi"
+                    android:textSize="13sp"
+                    android:textAllCaps="false"
+                    android:background="@android:drawable/btn_default"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"/>
 
-        </LinearLayout>
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="38dp"
+                    android:text="Ayam"
+                    android:textSize="13sp"
+                    android:textAllCaps="false"
+                    android:background="@android:drawable/btn_default"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="38dp"
+                    android:text="Dessert"
+                    android:textSize="13sp"
+                    android:textAllCaps="false"
+                    android:background="@android:drawable/btn_default"/>
+            </LinearLayout>
+        </HorizontalScrollView>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Resep Terbaru"
             android:textStyle="bold"
-            android:textSize="20sp"
-            android:layout_marginTop="20dp"/>
+            android:textSize="18sp"
+            android:textColor="#212121"
+            android:layout_marginTop="24dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginBottom="12dp"/>
 
-        <ImageView
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvRecipes"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:src="@drawable/nasigoreng"
-            android:scaleType="centerCrop"/>
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false" />
 
     </LinearLayout>
-
 </ScrollView>

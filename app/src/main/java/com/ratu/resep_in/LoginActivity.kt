@@ -13,8 +13,8 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        val email = findViewById<EditText>(R.id.etEmail)
-        val password = findViewById<EditText>(R.id.etPassword)
+        val email = findViewById<EditText>(R.id.edtEmail)
+        val password = findViewById<EditText>(R.id.edtPassword)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
         val btnGoogle = findViewById<Button>(R.id.btnGoogle)
 

@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "2406916519",
-    "project_id": "resep-in-790c6",
-    "storage_bucket": "resep-in-790c6.firebasestorage.app"
+    "project_number": "458612484724",
+    "project_id": "resepin-app-c5f5f",
+    "storage_bucket": "resepin-app-c5f5f.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:2406916519:android:c734229802ec5ed69e5682",
+        "mobilesdk_app_id": "1:458612484724:android:2a138dbaf90cc24dbe7f21",
         "android_client_info": {
           "package_name": "com.ratu.resep_in"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBAeEkWyGKOXN50dsSRVfSP_4rO2Hq_z-I"
+          "current_key": "AIzaSyCK6ehitN_Xa0oxPKg_SNLdA3B6rgxjB8g"
         }
       ],
       "services": {
