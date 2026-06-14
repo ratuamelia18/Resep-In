@@ -8,7 +8,10 @@ class AppController : Application() {
         super.onCreate()
 
         val config = mapOf(
-            "cloud_name" to "dh3kykrlb"
+            "cloud_name" to "dh3kykrlb",
+            "api_key" to "622123481599881",
+            "api_secret" to "dIA5TC04OKe-S-oQcdrpPmgTw0A"
+
         )
         MediaManager.init(this, config)
     }

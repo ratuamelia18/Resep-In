@@ -18,7 +18,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".LoginActivity"
+            android:name=".ui.theme.WelcomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,6 +29,9 @@
         <activity
             android:name=".MainActivity"
             android:exported="false" />
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".ui.theme.RegisterActivity" />
+        <activity android:name=".ui.theme.PreferenceActivity" />
 
     </application>
 

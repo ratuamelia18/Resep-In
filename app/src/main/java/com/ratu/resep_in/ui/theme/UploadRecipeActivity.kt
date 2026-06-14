@@ -6,6 +6,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.cloudinary.android.MediaManager
+import com.cloudinary.android.callback.ErrorInfo
+import com.cloudinary.android.callback.UploadCallback
+
 
 class UploadRecipeActivity : AppCompatActivity() {
 
@@ -37,77 +41,91 @@ class UploadRecipeActivity : AppCompatActivity() {
         tvVideoName = findViewById(R.id.tvVideoName)
 
         btnUploadImage.setOnClickListener {
-
             val intent = Intent(Intent.ACTION_PICK)
             intent.type = "image/*"
             startActivityForResult(intent, IMAGE_REQUEST)
-
         }
 
         btnUploadVideo.setOnClickListener {
-
             val intent = Intent(Intent.ACTION_PICK)
             intent.type = "video/*"
             startActivityForResult(intent, VIDEO_REQUEST)
-
         }
 
         btnSaveRecipe.setOnClickListener {
-
             val recipeName = etRecipeName.text.toString()
             val description = etDescription.text.toString()
             val ingredients = etIngredients.text.toString()
             val steps = etSteps.text.toString()
 
-            if (recipeName.isEmpty() ||
-                description.isEmpty() ||
-                ingredients.isEmpty() ||
-                steps.isEmpty()
-            ) {
+            if (recipeName.isEmpty() || description.isEmpty() || ingredients.isEmpty() || steps.isEmpty()) {
+                Toast.makeText(this, "Lengkapi semua data teks terlebih dahulu", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
-                Toast.makeText(
-                    this,
-                    "Lengkapi semua data",
-                    Toast.LENGTH_SHORT
-                ).show()
+            if (imageUri == null) {
+                Toast.makeText(this, "Mohon pilih foto resep terlebih dahulu", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
-            } else {
+            Toast.makeText(this, "Sedang mengunggah gambar...", Toast.LENGTH_SHORT).show()
 
-                Toast.makeText(
-                    this,
-                    "Resep berhasil disimpan",
-                    Toast.LENGTH_SHORT
-                ).show()
+            uploadFileToCloudinary(imageUri!!) { imageUrl ->
 
-                finish()
+                if (videoUri != null) {
+                    Toast.makeText(this, "Gambar sukses! Sedang mengunggah video...", Toast.LENGTH_SHORT).show()
+
+                    uploadFileToCloudinary(videoUri!!) { videoUrl ->
+                        simpanKeDatabase(recipeName, description, ingredients, steps, imageUrl, videoUrl)
+                    }
+                } else {
+                    simpanKeDatabase(recipeName, description, ingredients, steps, imageUrl, "")
+                }
             }
         }
     }
 
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?
-    ) {
 
-        super.onActivityResult(requestCode, resultCode, data)
+    private fun uploadFileToCloudinary(fileUri: Uri, onSuccessAction: (String) -> Unit) {
+        MediaManager.get().upload(fileUri)
+            .callback(object : UploadCallback {
+                override fun onStart(requestId: String) {}
 
-        if (resultCode == Activity.RESULT_OK && data != null) {
+                override fun onProgress(requestId: String, bytes: Long, totalBytes: Long) {}
 
-            when (requestCode) {
-
-                IMAGE_REQUEST -> {
-
-                    imageUri = data.data
-                    imgPreview.setImageURI(imageUri)
-
+                override fun onSuccess(requestId: String, resultData: Map<*, *>) {
+                    val uploadedUrl = resultData["secure_url"].toString()
+                    onSuccessAction(uploadedUrl)
                 }
 
-                VIDEO_REQUEST -> {
+                override fun onError(requestId: String, error: ErrorInfo) {
+                    Toast.makeText(this@UploadRecipeActivity, "Gagal upload media: ${error.description}", Toast.LENGTH_SHORT).show()
+                }
 
+                override fun onReschedule(requestId: String, error: ErrorInfo) {}
+            }).dispatch()
+    }
+
+    private fun simpanKeDatabase(
+        name: String, desc: String, ing: String, steps: String,
+        imgUrl: String, vidUrl: String
+    ) {
+
+        Toast.makeText(this, "Resep lengkap berhasil disimpan ke Cloud!", Toast.LENGTH_LONG).show()
+        finish()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            when (requestCode) {
+                IMAGE_REQUEST -> {
+                    imageUri = data.data
+                    imgPreview.setImageURI(imageUri)
+                }
+                VIDEO_REQUEST -> {
                     videoUri = data.data
                     tvVideoName.text = "Video berhasil dipilih"
-
                 }
             }
         }
