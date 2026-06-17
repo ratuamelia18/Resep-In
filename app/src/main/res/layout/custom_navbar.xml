@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="65dp"
+    android:background="@android:color/white"
+    android:elevation="12dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <LinearLayout android:id="@+id/navHome" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center" android:clickable="true" android:focusable="true" android:background="?attr/selectableItemBackgroundBorderless">
+        <ImageView android:id="@+id/iconHome" android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_home" android:scaleType="centerInside" />
+        <TextView android:id="@+id/textHome" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Beranda" android:textSize="10sp" android:textColor="@android:color/black" android:visibility="gone" />
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/navSearch" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center" android:clickable="true" android:focusable="true" android:background="?attr/selectableItemBackgroundBorderless">
+        <ImageView android:id="@+id/iconSearch" android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_search" android:scaleType="centerInside" />
+        <TextView android:id="@+id/textSearch" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Cari" android:textSize="10sp" android:textColor="@android:color/black" android:visibility="gone" />
+    </LinearLayout>
+
+    <ImageView android:id="@+id/navAdd" android:layout_width="0dp" android:layout_height="50dp" android:layout_weight="1" android:src="@drawable/ic_add_circle" android:scaleType="fitCenter" android:clickable="true" android:focusable="true" />
+
+    <LinearLayout android:id="@+id/navSave" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center" android:clickable="true" android:focusable="true" android:background="?attr/selectableItemBackgroundBorderless">
+        <ImageView android:id="@+id/iconSave" android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_bookmark" android:scaleType="centerInside" />
+        <TextView android:id="@+id/textSave" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Simpan" android:textSize="10sp" android:textColor="@android:color/black" android:visibility="gone" />
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/navProfile" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center" android:clickable="true" android:focusable="true" android:background="?attr/selectableItemBackgroundBorderless">
+        <ImageView android:id="@+id/iconProfile" android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_person" android:scaleType="centerInside" />
+        <TextView android:id="@+id/textProfile" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Profil" android:textSize="10sp" android:textColor="@android:color/black" android:visibility="gone" />
+    </LinearLayout>
+</LinearLayout>

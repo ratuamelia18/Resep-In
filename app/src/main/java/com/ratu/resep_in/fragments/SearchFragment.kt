@@ -1,6 +1,8 @@
 package com.ratu.resep_in.fragments
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +16,7 @@ class SearchFragment : Fragment() {
 
     private lateinit var listView: ListView
     private lateinit var search: EditText
+    private lateinit var adapter: ArrayAdapter<String>
 
     private val resepList = arrayListOf(
         "Nasi Goreng",
@@ -27,19 +30,29 @@ class SearchFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        val view =
-            inflater.inflate(R.layout.fragment_search, container, false)
+        val view = inflater.inflate(R.layout.fragment_search, container, false)
 
         listView = view.findViewById(R.id.listView)
         search = view.findViewById(R.id.edtSearch)
 
-        val adapter = ArrayAdapter(
+
+        adapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_list_item_1,
             resepList
         )
-
         listView.adapter = adapter
+
+
+        search.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                adapter.filter.filter(s)
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
 
         return view
     }

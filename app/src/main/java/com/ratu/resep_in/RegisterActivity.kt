@@ -46,11 +46,14 @@ class RegisterActivity : AppCompatActivity() {
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnSuccessListener { result ->
                     val userId = result.user?.uid ?: ""
+
                     val userMap = hashMapOf(
-                        "nama" to nama,
+                        "uid" to userId,
+                        "username" to nama,
                         "email" to email,
                         "pref_set" to false
                     )
+
                     db.collection("users").document(userId).set(userMap)
                         .addOnSuccessListener {
                             Toast.makeText(this, "Berhasil Daftar!", Toast.LENGTH_SHORT).show()
@@ -80,12 +83,17 @@ class RegisterActivity : AppCompatActivity() {
             try {
                 val account = task.getResult(ApiException::class.java)
                 val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-                auth.signInWithCredential(credential).addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
+                auth.signInWithCredential(credential).addOnCompleteListener { taskResult ->
+                    if (taskResult.isSuccessful) {
                         val userId = auth.currentUser?.uid ?: ""
                         db.collection("users").document(userId).get().addOnSuccessListener { doc ->
                             if (!doc.exists()) {
-                                val userMap = hashMapOf("email" to account.email, "pref_set" to false)
+                                val userMap = hashMapOf(
+                                    "uid" to userId,
+                                    "email" to account.email,
+                                    "username" to (account.displayName ?: "User Google"),
+                                    "pref_set" to false
+                                )
                                 db.collection("users").document(userId).set(userMap)
                             }
                             Toast.makeText(this, "Login Google Berhasil!", Toast.LENGTH_SHORT).show()

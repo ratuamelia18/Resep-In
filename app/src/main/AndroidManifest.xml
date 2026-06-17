@@ -32,6 +32,10 @@
         <activity android:name=".LoginActivity" />
         <activity android:name=".ui.theme.RegisterActivity" />
         <activity android:name=".ui.theme.PreferenceActivity" />
+        <activity
+            android:name=".ui.theme.SearchActivity"
+            android:exported="false" />
+        <activity android:name=".UploadActivity" />
 
     </application>
 

@@ -22,15 +22,21 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
 
         auth = FirebaseAuth.getInstance()
+
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            checkUserPreference(currentUser.uid)
+            return
+        }
+
+        setContentView(R.layout.activity_login)
 
         val etEmail = findViewById<TextInputEditText>(R.id.etEmail)
         val etPassword = findViewById<TextInputEditText>(R.id.etPassword)
         val btnMasuk = findViewById<Button>(R.id.btnMasuk)
         val btnGoogle = findViewById<Button>(R.id.btnGoogle)
-
 
         btnMasuk.setOnClickListener {
             val email = etEmail.text.toString().trim()
@@ -49,7 +55,6 @@ class LoginActivity : AppCompatActivity() {
                     Toast.makeText(this, "Gagal: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
         }
-
 
         btnGoogle.setOnClickListener {
             val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -79,11 +84,34 @@ class LoginActivity : AppCompatActivity() {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential)
             .addOnSuccessListener {
-                checkUserPreference(auth.currentUser?.uid)
+                saveGoogleUserToFirestore()
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Firebase Auth Gagal: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun saveGoogleUserToFirestore() {
+        val currentUser = auth.currentUser ?: return
+        val userRef = db.collection("users").document(currentUser.uid)
+
+        userRef.get().addOnSuccessListener { document ->
+            if (!document.exists()) {
+                val userData = hashMapOf(
+                    "uid" to currentUser.uid,
+                    "email" to currentUser.email,
+                    "username" to (currentUser.displayName ?: "User Google"),
+                    "pref_set" to false
+                )
+                userRef.set(userData).addOnSuccessListener {
+                    checkUserPreference(currentUser.uid)
+                }
+            } else {
+                checkUserPreference(currentUser.uid)
+            }
+        }.addOnFailureListener {
+            checkUserPreference(currentUser.uid)
+        }
     }
 
     private fun checkUserPreference(uid: String?) {

@@ -76,7 +76,7 @@
                 app:strokeWidth="1dp"
                 android:layout_marginBottom="10dp">
                 <TextView
-                    android:id="@+id/tvTitle"
+                    android:id="@+id/tvTitle1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Bisa Masak"
@@ -92,7 +92,7 @@
                 app:strokeWidth="1dp"
                 android:layout_marginBottom="10dp">
                 <TextView
-                    android:id="@+id/tvTitle"
+                    android:id="@+id/tvTitle2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Jago Masak"

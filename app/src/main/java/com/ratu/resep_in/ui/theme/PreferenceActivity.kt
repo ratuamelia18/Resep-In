@@ -33,7 +33,9 @@ class PreferenceActivity : AppCompatActivity() {
         val rv = findViewById<RecyclerView>(R.id.rvKategori)
         val btnLanjut = findViewById<Button>(R.id.btnLanjut)
 
-        // 1. Setup Logic Skill Card (Menghindari error getChildAt)
+        btnLanjut.isEnabled = false
+        btnLanjut.setBackgroundColor(Color.LTGRAY)
+
         val cardBaru = findViewById<MaterialCardView>(R.id.cardBaru)
         val cardBisa = findViewById<MaterialCardView>(R.id.cardBisa)
         val cardJago = findViewById<MaterialCardView>(R.id.cardJago)
@@ -44,7 +46,6 @@ class PreferenceActivity : AppCompatActivity() {
                 cards.forEach { it.setCardBackgroundColor(Color.WHITE) }
                 card.setCardBackgroundColor(Color.parseColor("#B74B4B"))
 
-                // Ambil teks dari TextView dengan ID tvTitle di dalam masing-masing card
                 val titleView = card.findViewById<TextView>(R.id.tvTitle)
                 selectedSkill = titleView.text.toString()
 
@@ -52,7 +53,6 @@ class PreferenceActivity : AppCompatActivity() {
             }
         }
 
-        // 2. Setup RecyclerView
         rv.layoutManager = GridLayoutManager(this, 2)
         db.collection("categories").get().addOnSuccessListener { snapshot ->
             categoryList = snapshot.toObjects(Category::class.java).toMutableList()
@@ -63,7 +63,6 @@ class PreferenceActivity : AppCompatActivity() {
             rv.adapter = adapter
         }
 
-        // 3. Tombol Lanjut
         btnLanjut.setOnClickListener {
             val selected = categoryList.filter { it.isSelected }.map { it.name }
             saveToFirebase(selected, selectedSkill)
