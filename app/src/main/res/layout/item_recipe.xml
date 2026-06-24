@@ -30,28 +30,27 @@
             android:layout_height="match_parent"
             android:layout_weight="2"
             android:orientation="vertical"
-            android:padding="12dp"
-            android:gravity="center_vertical">
+            android:padding="12dp">
 
             <TextView
                 android:id="@+id/tvRecipeTitleLatest"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="Ayam Serundeng"
                 android:textColor="#333333"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:maxLines="1"
-                android:ellipsize="end" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvRecipeCategoryLatest"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="Ayam"
                 android:textColor="#888888"
-                android:textSize="12sp"
-                android:layout_marginTop="2dp" />
+                android:textSize="12sp" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -59,50 +58,85 @@
                 android:layout_marginTop="8dp">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:id="@+id/layoutInfo"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_alignParentStart="true">
+                    android:orientation="horizontal">
 
-                    <ImageView
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:src="@android:drawable/btn_star_big_on"
-                        app:tint="#E9A428" />
-
-                    <TextView
-                        android:id="@+id/tvRecipeRatingLatest"
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="4.8"
-                        android:textColor="#666666"
-                        android:textSize="12sp"
-                        android:layout_marginStart="4dp" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@android:drawable/btn_star_big_on"
+                            app:tint="#E9A428" />
+                        <TextView
+                            android:id="@+id/tvRecipeRatingLatest"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:text="4.8"
+                            android:textColor="#666666"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@android:drawable/ic_lock_idle_alarm"
+                            app:tint="#888888" />
+                        <TextView
+                            android:id="@+id/tvRecipeDurationLatest"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:text="120 menit"
+                            android:textColor="#888888"
+                            android:textSize="12sp" />
+                    </LinearLayout>
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/layoutActions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:layout_below="@id/layoutInfo"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="4dp"
                     android:gravity="center_vertical"
-                    android:layout_alignParentEnd="true">
+                    android:orientation="horizontal">
+
+                    <CheckBox
+                        android:id="@+id/cbBookmark"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="8dp" />
 
                     <ImageView
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:src="@android:drawable/ic_lock_idle_alarm"
-                        app:tint="#888888" />
+                        android:id="@+id/btnEditRecipe"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="8dp"
+                        android:src="@android:drawable/ic_menu_edit"
+                        android:visibility="gone" />
 
-                    <TextView
-                        android:id="@+id/tvRecipeDurationLatest"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="120 menit"
-                        android:textColor="#888888"
-                        android:textSize="12sp"
-                        android:layout_marginStart="4dp" />
+                    <ImageView
+                        android:id="@+id/btnDeleteRecipe"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@android:drawable/ic_menu_delete"
+                        android:visibility="gone" />
                 </LinearLayout>
+
             </RelativeLayout>
         </LinearLayout>
     </LinearLayout>

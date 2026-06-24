@@ -107,7 +107,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:text="Lihat semua"
-                        android:textColor="#B74B4B"
+                        android:textColor="#B24141"
                         android:textSize="12sp"
                         android:textStyle="bold" />
                 </RelativeLayout>

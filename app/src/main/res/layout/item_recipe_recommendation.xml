@@ -68,13 +68,13 @@
                         android:layout_marginStart="4dp" />
                 </LinearLayout>
 
-                <ImageView
-                    android:id="@+id/icCheck"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                <CheckBox
+                    android:id="@+id/cbBookmark"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:layout_alignParentEnd="true"
-                    android:src="@android:drawable/btn_star"
-                    app:tint="#B74B4B" />
+                    android:button="@null"
+                    android:background="@drawable/selector_bookmark" />
 
             </RelativeLayout>
         </LinearLayout>

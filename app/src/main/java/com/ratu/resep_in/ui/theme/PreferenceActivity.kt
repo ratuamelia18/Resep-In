@@ -46,8 +46,8 @@ class PreferenceActivity : AppCompatActivity() {
                 cards.forEach { it.setCardBackgroundColor(Color.WHITE) }
                 card.setCardBackgroundColor(Color.parseColor("#B74B4B"))
 
-                val titleView = card.findViewById<TextView>(R.id.tvTitle)
-                selectedSkill = titleView.text.toString()
+                val titleView = card.getChildAt(0) as? TextView
+                selectedSkill = titleView?.text?.toString() ?: ""
 
                 checkValidation(btnLanjut)
             }

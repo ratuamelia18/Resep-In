@@ -7,19 +7,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.ratu.resep_in.R
 import com.ratu.resep_in.DetailRecipeActivity
-import com.ratu.resep_in.ui.theme.SearchActivity
+import com.ratu.resep_in.EditRecipeActivity
+import com.ratu.resep_in.DetailCategoryActivity
+import com.ratu.resep_in.R
 import com.ratu.resep_in.adapter.HomeCategory
 import com.ratu.resep_in.adapter.HomeCategoryAdapter
 import com.ratu.resep_in.adapter.RecommendationAdapter
 import com.ratu.resep_in.adapter.RecipeAdapter
 import com.ratu.resep_in.model.Recipe
+import com.ratu.resep_in.ui.theme.SearchActivity
 
 class HomeFragment : Fragment() {
 
@@ -32,11 +35,10 @@ class HomeFragment : Fragment() {
     private lateinit var rvLatest: RecyclerView
     private lateinit var searchBarHome: View
 
+
     private lateinit var recommendationAdapter: RecommendationAdapter
     private lateinit var categoryAdapter: HomeCategoryAdapter
     private lateinit var latestAdapter: RecipeAdapter
-
-    private val recipeList = mutableListOf<Recipe>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,22 +50,49 @@ class HomeFragment : Fragment() {
         rvRecommendation = view.findViewById(R.id.rvRecommendation)
         rvHomeCategory = view.findViewById(R.id.rvHomeCategory)
         rvLatest = view.findViewById(R.id.rvLatest)
-
         searchBarHome = view.findViewById(R.id.etSearch)
 
         rvRecommendation.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         rvHomeCategory.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         rvLatest.layoutManager = LinearLayoutManager(requireContext())
 
+        recommendationAdapter = RecommendationAdapter(mutableListOf()) { navigateToDetail(it) }
+        rvRecommendation.adapter = recommendationAdapter
+
+        latestAdapter = RecipeAdapter(
+            recipeList = mutableListOf(),
+            onItemClick = { navigateToDetail(it) },
+            onEditClick = { recipe ->
+                val intent = Intent(requireContext(), EditRecipeActivity::class.java)
+                intent.putExtra("RECIPE_DATA", recipe)
+                startActivity(intent)
+            },
+            onDeleteClick = { recipe ->
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Hapus Resep")
+                    .setMessage("Yakin mau hapus resep \"${recipe.title}\"?")
+                    .setPositiveButton("Hapus") { _, _ ->
+                        db.collection("resep").document(recipe.id)
+                            .delete()
+                            .addOnSuccessListener {
+                                Toast.makeText(requireContext(), "Resep berhasil dihapus", Toast.LENGTH_SHORT).show()
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(requireContext(), "Gagal menghapus resep", Toast.LENGTH_SHORT).show()
+                            }
+                    }
+                    .setNegativeButton("Batal", null)
+                    .show()
+            }
+        )
+        rvLatest.adapter = latestAdapter
+
         setupHomeCategories()
-
         loadUserProfile()
-
         loadDataFromCloud()
 
         searchBarHome.setOnClickListener {
-            val intent = Intent(requireContext(), SearchActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(requireContext(), SearchActivity::class.java))
         }
 
         return view
@@ -84,6 +113,9 @@ class HomeFragment : Fragment() {
 
         categoryAdapter = HomeCategoryAdapter(categories) { selectedCategory ->
             Toast.makeText(requireContext(), "Kategori ${selectedCategory.name} diklik", Toast.LENGTH_SHORT).show()
+            val intent = Intent(requireContext(), DetailCategoryActivity::class.java)
+            intent.putExtra("EXTRA_KATEGORI", selectedCategory.name)
+            startActivity(intent)
         }
         rvHomeCategory.adapter = categoryAdapter
     }
@@ -95,18 +127,18 @@ class HomeFragment : Fragment() {
             return
         }
 
-        val nameFromGoogle = currentUser.displayName
-        if (!nameFromGoogle.isNullOrEmpty()) {
-            tvGreeting.text = "Halo, $nameFromGoogle!"
+        if (!currentUser.displayName.isNullOrEmpty()) {
+            tvGreeting.text = "Halo, ${currentUser.displayName}!"
             return
         }
 
-        val uid = currentUser.uid
-        db.collection("users").document(uid).get()
+        db.collection("users").document(currentUser.uid).get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
-                    val name = document.getString("username")
+                    val name = document.getString("nama")
+                        ?: document.getString("username")
                         ?: document.getString("name")
+                        ?: currentUser.email?.substringBefore("@")
                         ?: "User"
                     tvGreeting.text = "Halo, $name!"
                 } else {
@@ -119,32 +151,26 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadDataFromCloud() {
-        db.collection("recipes")
+        db.collection("resep")
             .addSnapshotListener { value, error ->
                 if (error != null) {
-                    Toast.makeText(requireContext(), "Gagal memuat data Cloud", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Gagal memuat data", Toast.LENGTH_SHORT).show()
                     return@addSnapshotListener
                 }
 
-                recipeList.clear()
+                val newList = mutableListOf<Recipe>()
                 if (value != null) {
                     for (doc in value.documents) {
                         val recipe = doc.toObject(Recipe::class.java)
                         if (recipe != null) {
-                            recipeList.add(recipe.copy(id = doc.id))
+                            val ts = doc.getTimestamp("timestamp")?.seconds ?: 0L
+                            newList.add(recipe.copy(id = doc.id, timestamp = ts))
                         }
                     }
                 }
 
-                recommendationAdapter = RecommendationAdapter(recipeList) { clickedRecipe ->
-                    navigateToDetail(clickedRecipe)
-                }
-                rvRecommendation.adapter = recommendationAdapter
-
-                latestAdapter = RecipeAdapter(recipeList) { clickedRecipe ->
-                    navigateToDetail(clickedRecipe)
-                }
-                rvLatest.adapter = latestAdapter
+                recommendationAdapter.updateData(newList)
+                latestAdapter.updateData(newList)
             }
     }
 

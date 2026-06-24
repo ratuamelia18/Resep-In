@@ -7,11 +7,7 @@ import android.text.TextWatcher
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.view.View
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.GridLayoutManager
@@ -32,7 +28,6 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var layoutSuggestions: LinearLayout
     private lateinit var layoutSearchResults: LinearLayout
     private lateinit var tvNoResult: TextView
-
     private lateinit var btnSort: LinearLayout
     private lateinit var btnFilter: LinearLayout
 
@@ -60,9 +55,21 @@ class SearchActivity : AppCompatActivity() {
         rvRecommendations = findViewById(R.id.rvRecommendations)
         rvSearchResults = findViewById(R.id.rvSearchResults)
         tvNoResult = findViewById(R.id.tvNoResult)
-
         btnSort = findViewById(R.id.btnSort)
         btnFilter = findViewById(R.id.btnFilter)
+
+        searchResultAdapter = RecipeAdapter(
+            recipeList = currentFilteredResult,
+            onItemClick = { clickedRecipe ->
+                val intent = Intent(this, DetailRecipeActivity::class.java).apply {
+                    putExtra("RECIPE_DATA", clickedRecipe)
+                }
+                startActivity(intent)
+            }
+        )
+
+        rvSearchResults.adapter = searchResultAdapter
+        rvSearchResults.layoutManager = LinearLayoutManager(this)
 
         rvSuggestions.layoutManager = LinearLayoutManager(this)
         suggestionAdapter = SuggestionAdapter(currentSuggestionsList) { clickedText ->
@@ -73,14 +80,12 @@ class SearchActivity : AppCompatActivity() {
         rvSuggestions.adapter = suggestionAdapter
 
         rvRecommendations.layoutManager = GridLayoutManager(this, 2)
-        rvSearchResults.layoutManager = LinearLayoutManager(this)
 
         fetchAllRecipesFromCloud()
 
         btnBackSearch.setOnClickListener { finish() }
-
-        btnSort.setOnClickListener { view -> showSortingMenu(view) }
-        btnFilter.setOnClickListener { view -> showFilterMenu(view) }
+        btnSort.setOnClickListener { showSortingMenu(it) }
+        btnFilter.setOnClickListener { showFilterMenu(it) }
 
         etSearchInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -93,7 +98,7 @@ class SearchActivity : AppCompatActivity() {
                     layoutSearchResults.visibility = View.GONE
                 } else {
                     val filteredSuggestions = allRecipesMaster
-                        .filter { it.title.lowercase().contains(query.lowercase()) }
+                        .filter { it.title.contains(query, ignoreCase = true) }
                         .map { it.title }.distinct().take(5)
                     layoutSuggestions.visibility = View.VISIBLE
                     layoutSearchResults.visibility = View.GONE
@@ -113,11 +118,14 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun fetchAllRecipesFromCloud() {
-        db.collection("recipes").get().addOnSuccessListener { snapshots ->
+        db.collection("resep").get().addOnSuccessListener { snapshots ->
             allRecipesMaster.clear()
             for (doc in snapshots.documents) {
                 val recipe = doc.toObject(Recipe::class.java)
-                if (recipe != null) allRecipesMaster.add(recipe.copy(id = doc.id))
+                if (recipe != null) {
+                    val ts = doc.getTimestamp("timestamp")?.seconds ?: 0L
+                    allRecipesMaster.add(recipe.copy(id = doc.id, timestamp = ts))
+                }
             }
             setupRecommendationGrid()
         }
@@ -142,7 +150,7 @@ class SearchActivity : AppCompatActivity() {
 
         currentFilteredResult.clear()
         currentFilteredResult.addAll(allRecipesMaster.filter {
-            it.title.lowercase().contains(query.lowercase())
+            it.title.contains(query, ignoreCase = true)
         })
 
         displaySearchResults()
@@ -156,14 +164,7 @@ class SearchActivity : AppCompatActivity() {
         } else {
             tvNoResult.visibility = View.GONE
             rvSearchResults.visibility = View.VISIBLE
-
-            searchResultAdapter = RecipeAdapter(currentFilteredResult) { clickedRecipe ->
-                val intent = Intent(this, DetailRecipeActivity::class.java).apply {
-                    putExtra("RECIPE_DATA", clickedRecipe)
-                }
-                startActivity(intent)
-            }
-            rvSearchResults.adapter = searchResultAdapter
+            searchResultAdapter.updateData(currentFilteredResult)
         }
     }
 
@@ -178,14 +179,14 @@ class SearchActivity : AppCompatActivity() {
 
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
-                1 -> currentFilteredResult.sortByDescending { it.rating }
+                1 -> currentFilteredResult.sortByDescending { it.averageRating }
                 2 -> currentFilteredResult.sortByDescending { it.timestamp }
-                3 -> currentFilteredResult.sortByDescending { it.rating }
-                4 -> currentFilteredResult.sortBy { it.rating }
+                3 -> currentFilteredResult.sortByDescending { it.averageRating }
+                4 -> currentFilteredResult.sortBy { it.averageRating }
                 5 -> currentFilteredResult.sortBy { it.duration }
                 6 -> currentFilteredResult.sortByDescending { it.duration }
             }
-            displaySearchResults()
+            searchResultAdapter.updateData(currentFilteredResult)
             true
         }
         popup.show()
@@ -194,12 +195,12 @@ class SearchActivity : AppCompatActivity() {
     private fun showFilterMenu(anchorView: View) {
         val popup = PopupMenu(this, anchorView)
         popup.menu.add(0, 1, 0, "Waktu Kilat (< 15 menit)")
-        popup.menu.add(0, 2, 1, "Rating 4 ke atas")
+        popup.menu.add(0, 2, 1, "averageRating 4 ke atas")
 
         popup.setOnMenuItemClickListener { item ->
             val filtered = when (item.itemId) {
                 1 -> allRecipesMaster.filter { it.duration < 15 }
-                2 -> allRecipesMaster.filter { it.rating >= 4.0 }
+                2 -> allRecipesMaster.filter { it.averageRating >= 4.0 }
                 else -> allRecipesMaster
             }
             currentFilteredResult.clear()

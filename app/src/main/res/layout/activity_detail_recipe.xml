@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -20,12 +19,11 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginStart="16dp"
-            android:src="@android:drawable/ic_menu_revert"
-            android:scaleX="-1"
-            app:tint="#FFFFFF"
+            android:src="@drawable/ic_back_arrow"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="#FFFFFF" />
 
         <TextView
             android:id="@+id/tvHeaderTitle"
@@ -41,18 +39,17 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/headerBar"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerBar">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
+            android:orientation="vertical"
+            android:paddingBottom="20dp">
 
             <FrameLayout
                 android:id="@+id/videoContainer"
@@ -60,34 +57,23 @@
                 android:layout_height="220dp"
                 android:background="#000000">
 
-
-                <ImageView
-                    android:id="@+id/imgVideoThumbnail"
+                <androidx.media3.ui.PlayerView
+                    android:id="@+id/playerView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:src="@android:drawable/ic_menu_gallery" />
-
-
-                <ImageView
-                    android:id="@+id/btnPlayVideo"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_gravity="center"
-                    android:src="@android:drawable/ic_media_play"
-                    app:tint="#FFFFFF" />
+                    app:show_buffering="when_playing"
+                    app:use_controller="true" />
             </FrameLayout>
-
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabLayoutRecipe"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:tabGravity="fill"
                 app:tabIndicatorColor="#B74B4B"
-                app:tabSelectedTextColor="#B74B4B"
-                app:tabTextColor="#666666"
                 app:tabMode="fixed"
-                app:tabGravity="fill">
+                app:tabSelectedTextColor="#B74B4B"
+                app:tabTextColor="#666666">
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
@@ -105,36 +91,115 @@
                     android:text="Langkah" />
             </com.google.android.material.tabs.TabLayout>
 
-
-            <LinearLayout
-                android:id="@+id/contentContainer"
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
+                android:layout_margin="16dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
 
-
-                <TextView
-                    android:id="@+id/tvContentTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Bahan"
-                    android:textColor="#333333"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="12dp"/>
-
-
-                <TextView
-                    android:id="@+id/tvContentDescription"
+                <LinearLayout
+                    android:id="@+id/contentContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="• 3 siung bawang putih, cincang\n• 5 siung bawang merah, iris tipis\n• 3 sdm minyak goreng"
-                    android:textColor="#444444"
-                    android:textSize="14sp"
-                    android:lineSpacingExtra="6dp" />
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-            </LinearLayout>
+                    <TextView
+                        android:id="@+id/tvContentTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:text="Bahan"
+                        android:textColor="#333333"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvContentDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingExtra="6dp"
+                        android:text="• 3 siung bawang putih, cincang\n• 5 siung bawang merah, iris tipis\n• 3 sdm minyak goreng"
+                        android:textColor="#444444"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:text="Tulis Komentar"
+                android:textColor="#333333"
+                android:textStyle="bold" />
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <RatingBar
+                        android:id="@+id/rbUserRating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:numStars="5"
+                        android:stepSize="1.0" />
+
+                    <EditText
+                        android:id="@+id/etUserComment"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:background="@android:color/transparent"
+                        android:hint="Bagikan pengalaman masak kamu..."
+                        android:inputType="textMultiLine"
+                        android:minLines="2"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:id="@+id/btnSendComment"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="end"
+                        android:layout_marginTop="8dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Kirim Komentar"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_send" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:text="Komentar Pengguna"
+                android:textColor="#333333"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvComments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:layout_marginBottom="50dp"
+                android:minHeight="200dp"
+                android:nestedScrollingEnabled="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_comment" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

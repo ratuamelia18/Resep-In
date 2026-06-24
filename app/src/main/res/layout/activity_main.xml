@@ -9,11 +9,12 @@
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
-
+        android:layout_weight="1"
+        android:elevation="10dp" />
     <include
         android:id="@+id/customNavbar"
         layout="@layout/custom_navbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
 </LinearLayout>

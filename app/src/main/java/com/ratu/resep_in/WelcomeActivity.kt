@@ -52,7 +52,7 @@ class WelcomeActivity : AppCompatActivity() {
             }
             override fun updateDrawState(ds: TextPaint) {
                 super.updateDrawState(ds)
-                ds.color = Color.parseColor("#A94442") // Warna merah bawaanmu
+                ds.color = Color.parseColor("#A94442")
                 ds.isUnderlineText = false
             }
         }

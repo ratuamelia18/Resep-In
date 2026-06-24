@@ -36,6 +36,11 @@
             android:name=".ui.theme.SearchActivity"
             android:exported="false" />
         <activity android:name=".UploadActivity" />
+        <activity android:name=".DetailRecipeActivity"
+            android:exported="false" />
+        <activity android:name=".EditRecipeActivity" />
+        <activity android:name=".DetailCategoryActivity" />
+
 
     </application>
 

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.ratu.resep_in.fragment.SavedFragment
 import com.ratu.resep_in.fragments.*
 import com.ratu.resep_in.ui.theme.PreferenceActivity
 import com.ratu.resep_in.ui.theme.SearchActivity
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
 
         checkUserPreference()
@@ -47,12 +49,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         navbar.findViewById<LinearLayout>(R.id.navSave).setOnClickListener {
-            replaceFragment(FavoriteFragment())
+            replaceFragment(SavedFragment())
             updateNavbarState("save")
         }
 
         navbar.findViewById<LinearLayout>(R.id.navProfile).setOnClickListener {
-            replaceFragment(AccountFragment())
+            replaceFragment(ProfileFragment())
             updateNavbarState("profile")
         }
     }

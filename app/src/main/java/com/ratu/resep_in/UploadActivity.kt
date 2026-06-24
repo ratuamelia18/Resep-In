@@ -8,8 +8,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.cloudinary.android.MediaManager
 import com.cloudinary.android.callback.ErrorInfo
 import com.cloudinary.android.callback.UploadCallback
-import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FieldValue
 
 class UploadActivity : AppCompatActivity() {
 
@@ -17,17 +18,10 @@ class UploadActivity : AppCompatActivity() {
     private var selectedFotoUri: Uri? = null
 
     private val pickVideo = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        if (uri != null) {
-            selectedVideoUri = uri
-            Toast.makeText(this, "Video terpilih!", Toast.LENGTH_SHORT).show()
-        }
+        if (uri != null) { selectedVideoUri = uri; Toast.makeText(this, "Video terpilih!", Toast.LENGTH_SHORT).show() }
     }
-
     private val pickFoto = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        if (uri != null) {
-            selectedFotoUri = uri
-            Toast.makeText(this, "Foto terpilih!", Toast.LENGTH_SHORT).show()
-        }
+        if (uri != null) { selectedFotoUri = uri; Toast.makeText(this, "Foto terpilih!", Toast.LENGTH_SHORT).show() }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,22 +75,19 @@ class UploadActivity : AppCompatActivity() {
 
     private fun uploadKeCloudinary(uri: Uri, isVideo: Boolean, callback: (String) -> Unit) {
         val uploadRequest = MediaManager.get().upload(uri)
-
         if (isVideo) {
             uploadRequest.option("resource_type", "video")
             uploadRequest.option("transformation", "c_limit,w_1280,h_720,q_auto:low")
         } else {
             uploadRequest.option("resource_type", "image")
         }
-
         uploadRequest.callback(object : UploadCallback {
-            override fun onSuccess(requestId: String, resultData: Map<*, *>) {
-                callback(resultData["secure_url"].toString())
-            }
+            override fun onSuccess(requestId: String, resultData: Map<*, *>) { callback(resultData["secure_url"].toString()) }
             override fun onError(requestId: String, error: ErrorInfo) {
-                Toast.makeText(this@UploadActivity, "Gagal: ${error.description}", Toast.LENGTH_LONG).show()
-                findViewById<Button>(R.id.btnSubmit).isEnabled = true
-                findViewById<Button>(R.id.btnSubmit).text = "Simpan"
+                val btnSubmit = findViewById<Button>(R.id.btnSubmit)
+                btnSubmit.isEnabled = true
+                btnSubmit.text = "Simpan"
+                Toast.makeText(this@UploadActivity, "Gagal upload media: ${error.description}", Toast.LENGTH_SHORT).show()
             }
             override fun onStart(id: String) {}
             override fun onProgress(id: String, b: Long, t: Long) {}
@@ -106,19 +97,32 @@ class UploadActivity : AppCompatActivity() {
 
     private fun simpanKeFirebase(nama: String, kat: String, bah: String, lan: String, img: String, vid: String) {
         val db = FirebaseFirestore.getInstance()
-        val data = mapOf(
-            "nama" to nama, "kategori" to kat, "bahan" to bah,
-            "langkah" to lan, "foto" to img, "video" to vid,
-            "timestamp" to Timestamp.now()
+        val btnSubmit = findViewById<Button>(R.id.btnSubmit)
+
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val authorName = currentUser?.displayName ?: currentUser?.email ?: "Anonim"
+
+        val data = hashMapOf<String, Any>(
+            "title" to nama,
+            "kategori" to kat,
+            "bahan" to bah.split("\n").filter { it.isNotBlank() },
+            "langkah" to lan.split("\n").filter { it.isNotBlank() },
+            "foto" to img,
+            "videoUrl" to vid,
+            "rating" to 0.0,
+            "duration" to 0,
+            "author" to authorName,
+            "authorId" to (currentUser?.uid ?: ""),
+            "timestamp" to FieldValue.serverTimestamp()
         )
 
         db.collection("resep").add(data).addOnSuccessListener {
-            Toast.makeText(this, "Resep berhasil disimpan!", Toast.LENGTH_LONG).show()
-            finish()
-        }.addOnFailureListener {
-            Toast.makeText(this, "Gagal simpan ke database!", Toast.LENGTH_SHORT).show()
-            findViewById<Button>(R.id.btnSubmit).isEnabled = true
-            findViewById<Button>(R.id.btnSubmit).text = "Simpan"
+            btnSubmit.text = "Terunggah"
+            btnSubmit.postDelayed({ finish() }, 1000)
+        }.addOnFailureListener { e ->
+            btnSubmit.isEnabled = true
+            btnSubmit.text = "Simpan"
+            Toast.makeText(this, "Gagal simpan: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 }
