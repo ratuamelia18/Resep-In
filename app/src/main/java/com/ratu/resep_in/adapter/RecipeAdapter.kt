@@ -42,9 +42,10 @@ class RecipeAdapter(
         val currentUid = FirebaseAuth.getInstance().currentUser?.uid
         val db = FirebaseFirestore.getInstance()
 
+
         holder.tvTitle.text = item.title
         holder.tvCategory.text = item.category
-        holder.tvRating.text = item.averageRating.toString()
+        holder.tvRating.text = String.format(java.util.Locale.getDefault(), "%.2f", item.averageRating)
         holder.tvDuration.text = "${item.duration} menit"
 
         Glide.with(holder.itemView.context)

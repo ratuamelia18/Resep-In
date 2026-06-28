@@ -13,13 +13,14 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.tabs.TabLayout
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ratu.resep_in.R
 import com.ratu.resep_in.DetailRecipeActivity
-import com.ratu.resep_in.adapter.SuggestionAdapter
-import com.ratu.resep_in.adapter.RecommendationAdapter
-import com.ratu.resep_in.adapter.RecipeAdapter
+import com.ratu.resep_in.adapter.*
 import com.ratu.resep_in.model.Recipe
+import com.ratu.resep_in.model.User
+import com.google.firebase.auth.FirebaseAuth
 
 class SearchActivity : AppCompatActivity() {
 
@@ -30,6 +31,9 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var tvNoResult: TextView
     private lateinit var btnSort: LinearLayout
     private lateinit var btnFilter: LinearLayout
+    private lateinit var tabSearch: TabLayout
+
+    private lateinit var filterGroup: LinearLayout
 
     private lateinit var rvSuggestions: RecyclerView
     private lateinit var suggestionAdapter: SuggestionAdapter
@@ -37,11 +41,14 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var recommendationAdapter: RecommendationAdapter
     private lateinit var rvSearchResults: RecyclerView
     private lateinit var searchResultAdapter: RecipeAdapter
+    private lateinit var userAdapter: UserAdapter
 
     private val db = FirebaseFirestore.getInstance()
     private val allRecipesMaster = mutableListOf<Recipe>()
     private val currentSuggestionsList = mutableListOf<String>()
     private val currentFilteredResult = mutableListOf<Recipe>()
+
+    private var isSearchingUser = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +64,7 @@ class SearchActivity : AppCompatActivity() {
         tvNoResult = findViewById(R.id.tvNoResult)
         btnSort = findViewById(R.id.btnSort)
         btnFilter = findViewById(R.id.btnFilter)
+        tabSearch = findViewById(R.id.tabSearch)
 
         searchResultAdapter = RecipeAdapter(
             recipeList = currentFilteredResult,
@@ -65,11 +73,25 @@ class SearchActivity : AppCompatActivity() {
                     putExtra("RECIPE_DATA", clickedRecipe)
                 }
                 startActivity(intent)
+            },
+            onEditClick = null,
+            onDeleteClick = null
+        )
+
+        userAdapter = UserAdapter(
+            userList = emptyList(),
+            onItemClick = { user ->
+                val intent = Intent(this, OtherProfileActivity::class.java)
+                intent.putExtra("USER_ID", user.id)
+                startActivity(intent)
+            },
+            onFollowClick = { user ->
+                toggleFollow(user.id)
             }
         )
 
-        rvSearchResults.adapter = searchResultAdapter
         rvSearchResults.layoutManager = LinearLayoutManager(this)
+        rvSearchResults.adapter = searchResultAdapter
 
         rvSuggestions.layoutManager = LinearLayoutManager(this)
         suggestionAdapter = SuggestionAdapter(currentSuggestionsList) { clickedText ->
@@ -80,8 +102,18 @@ class SearchActivity : AppCompatActivity() {
         rvSuggestions.adapter = suggestionAdapter
 
         rvRecommendations.layoutManager = GridLayoutManager(this, 2)
-
         fetchAllRecipesFromCloud()
+
+        tabSearch.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                isSearchingUser = (tab?.position == 1)
+                rvSearchResults.adapter = if (isSearchingUser) userAdapter else searchResultAdapter
+                val query = etSearchInput.text.toString().trim()
+                if (query.isNotEmpty()) performSearch(query)
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
 
         btnBackSearch.setOnClickListener { finish() }
         btnSort.setOnClickListener { showSortingMenu(it) }
@@ -92,17 +124,17 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val query = s.toString().trim()
                 if (query.isEmpty()) {
-                    currentSuggestionsList.clear()
-                    suggestionAdapter.updateData(currentSuggestionsList, "")
                     layoutSuggestions.visibility = View.VISIBLE
                     layoutSearchResults.visibility = View.GONE
                 } else {
-                    val filteredSuggestions = allRecipesMaster
-                        .filter { it.title.contains(query, ignoreCase = true) }
-                        .map { it.title }.distinct().take(5)
                     layoutSuggestions.visibility = View.VISIBLE
                     layoutSearchResults.visibility = View.GONE
-                    suggestionAdapter.updateData(filteredSuggestions, query)
+                    if (!isSearchingUser) {
+                        val filteredSuggestions = allRecipesMaster
+                            .filter { it.title.contains(query, ignoreCase = true) }
+                            .map { it.title }.distinct().take(5)
+                        suggestionAdapter.updateData(filteredSuggestions, query)
+                    }
                 }
             }
             override fun afterTextChanged(s: Editable?) {}
@@ -114,6 +146,36 @@ class SearchActivity : AppCompatActivity() {
                 if (query.isNotEmpty()) performSearch(query)
                 true
             } else false
+        }
+    }
+
+
+    private fun performSearch(query: String) {
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(etSearchInput.windowToken, 0)
+
+        layoutSuggestions.visibility = View.GONE
+        layoutSearchResults.visibility = View.VISIBLE
+
+        if (isSearchingUser) {
+            db.collection("users")
+                .orderBy("username")
+                .startAt(query.lowercase())
+                .endAt(query.lowercase() + "\uf8ff")
+                .get()
+                .addOnSuccessListener { snapshots ->
+                    val userList = snapshots.toObjects(User::class.java)
+                    userAdapter.updateData(userList)
+                    rvSearchResults.visibility = if (userList.isEmpty()) View.GONE else View.VISIBLE
+                    tvNoResult.visibility = if (userList.isEmpty()) View.VISIBLE else View.GONE
+                    tvNoResult.text = "Pengguna tidak ditemukan"
+                }
+        } else {
+            currentFilteredResult.clear()
+            currentFilteredResult.addAll(allRecipesMaster.filter {
+                it.title.contains(query, ignoreCase = true)
+            })
+            displaySearchResults()
         }
     }
 
@@ -139,21 +201,6 @@ class SearchActivity : AppCompatActivity() {
             startActivity(intent)
         }
         rvRecommendations.adapter = recommendationAdapter
-    }
-
-    private fun performSearch(query: String) {
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(etSearchInput.windowToken, 0)
-
-        layoutSuggestions.visibility = View.GONE
-        layoutSearchResults.visibility = View.VISIBLE
-
-        currentFilteredResult.clear()
-        currentFilteredResult.addAll(allRecipesMaster.filter {
-            it.title.contains(query, ignoreCase = true)
-        })
-
-        displaySearchResults()
     }
 
     private fun displaySearchResults() {
@@ -209,5 +256,29 @@ class SearchActivity : AppCompatActivity() {
             true
         }
         popup.show()
+    }
+
+    private fun toggleFollow(targetUserId: String) {
+        val currentUid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val followId = "${currentUid}_${targetUserId}"
+        val followRef = db.collection("follows").document(followId)
+
+        val meRef = db.collection("users").document(currentUid)
+        val targetRef = db.collection("users").document(targetUserId)
+
+        followRef.get().addOnSuccessListener { doc ->
+            if (doc.exists()) {
+                followRef.delete()
+                meRef.update("followingCount", com.google.firebase.firestore.FieldValue.increment(-1))
+                targetRef.update("followerCount", com.google.firebase.firestore.FieldValue.increment(-1))
+                Toast.makeText(this, "Berhenti mengikuti", Toast.LENGTH_SHORT).show()
+            } else {
+                val followData = mapOf("followerId" to currentUid, "followedId" to targetUserId)
+                followRef.set(followData)
+                meRef.update("followingCount", com.google.firebase.firestore.FieldValue.increment(1))
+                targetRef.update("followerCount", com.google.firebase.firestore.FieldValue.increment(1))
+                Toast.makeText(this, "Mengikuti!", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

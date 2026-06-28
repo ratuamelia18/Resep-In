@@ -6,6 +6,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
 
     <application
         android:name=".AppController"
@@ -40,6 +43,12 @@
             android:exported="false" />
         <activity android:name=".EditRecipeActivity" />
         <activity android:name=".DetailCategoryActivity" />
+        <activity android:name=".EditProfileActivity" />
+        <activity android:name=".ui.theme.OtherProfileActivity" />
+        <activity android:name=".FollowListActivity"/>
+        <activity android:name=".SettingsActivity"/>
+        <activity android:name=".ArsipActivity"/>
+
 
 
     </application>

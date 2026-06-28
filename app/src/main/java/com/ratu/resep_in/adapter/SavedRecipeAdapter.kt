@@ -20,9 +20,9 @@ class SavedRecipeAdapter(
 ) : RecyclerView.Adapter<SavedRecipeAdapter.SavedViewHolder>() {
 
     class SavedViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imgCategory: ImageView = itemView.findViewById(R.id.imgCategory)
+        val imgPost: ImageView = itemView.findViewById(R.id.imgPost)
+        val tvTitle: TextView = itemView.findViewById(R.id.tvTitle)
         val tvCategoryName: TextView = itemView.findViewById(R.id.tvCategoryName)
-        val cbBookmark: CheckBox = itemView.findViewById(R.id.cbBookmark)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SavedViewHolder {
@@ -35,37 +35,13 @@ class SavedRecipeAdapter(
         val currentUid = FirebaseAuth.getInstance().currentUser?.uid
         val db = FirebaseFirestore.getInstance()
 
-        holder.tvCategoryName.text = recipe.title
-        Glide.with(holder.itemView.context).load(recipe.imgurl).into(holder.imgCategory)
+        holder.tvTitle.text = recipe.title
+        holder.tvCategoryName.text = recipe.category
+
+
+        Glide.with(holder.itemView.context).load(recipe.imgurl).into(holder.imgPost)
         holder.itemView.setOnClickListener { onItemClick(recipe) }
 
-        if (currentUid != null) {
-            val favId = "${currentUid}_${recipe.id}"
-
-            holder.cbBookmark.setOnClickListener(null)
-
-            db.collection("favorites").document(favId).get()
-                .addOnSuccessListener { doc ->
-                    holder.cbBookmark.isChecked = doc.exists()
-                }
-
-            holder.cbBookmark.setOnClickListener {
-                val isChecked = holder.cbBookmark.isChecked
-
-                if (isChecked) {
-                    val data = mapOf("userId" to currentUid, "recipeId" to recipe.id)
-                    db.collection("favorites").document(favId).set(data)
-                        .addOnSuccessListener {
-                            Toast.makeText(holder.itemView.context, "Disimpan ke bookmark", Toast.LENGTH_SHORT).show()
-                        }
-                } else {
-                    db.collection("favorites").document(favId).delete()
-                        .addOnSuccessListener {
-                            Toast.makeText(holder.itemView.context, "Dihapus dari bookmark", Toast.LENGTH_SHORT).show()
-                        }
-                }
-            }
-        }
     }
 
     override fun getItemCount(): Int = recipeList.size

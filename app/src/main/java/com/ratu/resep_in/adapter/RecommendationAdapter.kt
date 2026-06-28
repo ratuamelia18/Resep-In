@@ -38,7 +38,7 @@ class RecommendationAdapter(
         val db = FirebaseFirestore.getInstance()
 
         holder.tvTitle.text = item.title
-        holder.tvRating.text = item.averageRating.toString()
+        holder.tvRating.text = String.format(java.util.Locale.getDefault(), "%.2f", item.averageRating)
 
         Glide.with(holder.img.context)
             .load(item.imgurl)

@@ -17,7 +17,6 @@ import android.widget.ImageView
 import android.widget.RatingBar
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.Query
 import android.util.Log
 
@@ -35,6 +34,7 @@ class DetailRecipeActivity : AppCompatActivity() {
     private lateinit var etUserComment: EditText
     private lateinit var btnSendComment: ImageView
     private lateinit var rbUserRating: RatingBar
+    private lateinit var tvCommentCountTitle: TextView
 
     private var player: ExoPlayer? = null
     private var currentRecipe: Recipe? = null
@@ -49,6 +49,7 @@ class DetailRecipeActivity : AppCompatActivity() {
         playerView = findViewById(R.id.playerView)
         btnBack = findViewById(R.id.btnBack)
         tabLayoutRecipe = findViewById(R.id.tabLayoutRecipe)
+        tvCommentCountTitle = findViewById(R.id.tvCommentCountTitle)
 
         currentRecipe = intent.getSerializableExtra("RECIPE_DATA") as? Recipe
 
@@ -72,8 +73,27 @@ class DetailRecipeActivity : AppCompatActivity() {
         etUserComment = findViewById(R.id.etUserComment)
         btnSendComment = findViewById(R.id.btnSendComment)
         rbUserRating = findViewById(R.id.rbUserRating)
+        tvCommentCountTitle = findViewById(R.id.tvCommentCountTitle)
 
-        commentAdapter = CommentAdapter(emptyList())
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+
+        commentAdapter = CommentAdapter(
+            commentList = emptyList(),
+            currentUserUid = currentUserId,
+            onDeleteClick = { commentToDelete ->
+                deleteCommentFromFirestore(commentToDelete)
+            },
+            onUserClick = { userId ->
+                if (userId != currentUserId) {
+                    val intent = android.content.Intent(this, com.ratu.resep_in.ui.theme.OtherProfileActivity::class.java)
+                    intent.putExtra("USER_ID", userId)
+                    startActivity(intent)
+                } else {
+                    Toast.makeText(this, "Ini profil Anda", Toast.LENGTH_SHORT).show()
+                }
+            }
+        )
+
         rvComments.layoutManager = LinearLayoutManager(this)
         rvComments.adapter = commentAdapter
 
@@ -92,18 +112,46 @@ class DetailRecipeActivity : AppCompatActivity() {
         }
     }
 
-    private fun postCommentAndRating(recipeId: String, userId: String, rating: Float, commentText: String) {
-        if (recipeId.isEmpty()) {
-            Log.e("DEBUG_ERROR", "Recipe ID kosong!")
-            return
+    private fun deleteCommentFromFirestore(comment: com.ratu.resep_in.model.Comment) {
+        val db = FirebaseFirestore.getInstance()
+        val recipeRef = db.collection("resep").document(comment.recipeId)
+        val commentRef = db.collection("comments").document(comment.id)
+
+        db.runTransaction { transaction ->
+            val snapshot = transaction.get(recipeRef)
+            val currentAvg = snapshot.getDouble("averageRating") ?: 0.0
+            val currentCount = snapshot.getLong("ratingCount") ?: 0L
+
+            if (currentCount > 0) {
+                val totalRatingLama = currentAvg * currentCount
+                val newCount = currentCount - 1
+                val newAvg = if (newCount > 0) (totalRatingLama - comment.rating.toDouble()) / newCount else 0.0
+
+                transaction.update(recipeRef, "averageRating", newAvg, "ratingCount", newCount)
+                transaction.delete(commentRef)
+                return@runTransaction newAvg
+            }
+            null
+        }.addOnSuccessListener { newAvg ->
+            Toast.makeText(this, "Komentar dihapus", Toast.LENGTH_SHORT).show()
+            if (newAvg != null) {
+                currentRecipe?.averageRating = newAvg
+                showDetailTab()
+            }
+        }.addOnFailureListener { e ->
+            Toast.makeText(this, "Gagal: ${e.message}", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun postCommentAndRating(recipeId: String, userId: String, rating: Float, commentText: String) {
+        if (recipeId.isEmpty()) return
 
         val db = FirebaseFirestore.getInstance()
         val recipeRef = db.collection("resep").document(recipeId)
 
         db.collection("users").document(userId).get().addOnSuccessListener { doc ->
             val username = doc.getString("username") ?: "User"
-            val userPhoto = doc.getString("photoUrl") ?: ""
+            val userPhoto = doc.getString("profileImageUrl") ?: ""
             val commentRef = db.collection("comments").document()
 
             val commentData = mapOf(
@@ -118,10 +166,7 @@ class DetailRecipeActivity : AppCompatActivity() {
 
             db.runTransaction { transaction ->
                 val snapshot = transaction.get(recipeRef)
-
-                if (!snapshot.exists()) {
-                    throw Exception("Dokumen resep tidak ditemukan di database!")
-                }
+                if (!snapshot.exists()) throw Exception("Resep tidak ditemukan!")
 
                 val currentAvg = snapshot.getDouble("averageRating") ?: 0.0
                 val currentCount = snapshot.getLong("ratingCount") ?: 0L
@@ -136,7 +181,6 @@ class DetailRecipeActivity : AppCompatActivity() {
                 rbUserRating.rating = 0f
                 Toast.makeText(this, "Komentar terkirim!", Toast.LENGTH_SHORT).show()
             }.addOnFailureListener { e ->
-                Log.e("DEBUG_ERROR", "Error transaksi: ${e.message}")
                 Toast.makeText(this, "Gagal: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
@@ -146,9 +190,10 @@ class DetailRecipeActivity : AppCompatActivity() {
         FirebaseFirestore.getInstance().collection("comments")
             .whereEqualTo("recipeId", recipeId)
             .orderBy("timestamp", Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshots, _ ->
+            .addSnapshotListener { snapshots, e ->
+                if (e != null) return@addSnapshotListener
                 val comments = snapshots?.toObjects(com.ratu.resep_in.model.Comment::class.java) ?: emptyList()
-                Log.d("DEBUG_TEST", "Jumlah komentar tanpa filter: ${comments.size}")
+                tvCommentCountTitle.text = "Komentar Pengguna (${comments.size})"
                 commentAdapter.updateData(comments)
             }
     }
@@ -188,7 +233,8 @@ class DetailRecipeActivity : AppCompatActivity() {
         currentRecipe?.let { recipe ->
             tvContentTitle.text = recipe.title
             tvContentTitle.textSize = 24f
-            val baseInfo = "Kategori: ${recipe.category}\nRating: ⭐ ${recipe.averageRating}\nWaktu: ${recipe.duration} menit"
+            val formattedRating = String.format("%.2f", recipe.averageRating)
+            val baseInfo = "Kategori: ${recipe.category}\nRating: ⭐ $formattedRating\nWaktu: ${recipe.duration} menit"
             if (!recipe.authorId.isNullOrEmpty()) {
                 FirebaseFirestore.getInstance().collection("users").document(recipe.authorId).get()
                     .addOnSuccessListener { doc -> tvContentDescription.text = "Oleh: ${doc.getString("username") ?: "Anonim"}\n$baseInfo" }

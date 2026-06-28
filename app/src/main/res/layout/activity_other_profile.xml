@@ -12,21 +12,6 @@
         android:background="#B24141"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/btnSettings"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
-        android:focusable="true"
-        android:padding="8dp"
-        android:src="@drawable/ic_setting"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="#FFFFFF" />
-
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/profileCard"
         android:layout_width="match_parent"
@@ -112,12 +97,12 @@
             <TextView android:id="@+id/tvBio" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Bio user..." android:textSize="14sp" />
 
             <Button
-                android:id="@+id/btnEditProfile"
+                android:id="@+id/btnFollow"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:layout_marginTop="16dp"
                 android:backgroundTint="#B24141"
-                android:text="Edit Profil"
+                android:text="Follow"
                 app:cornerRadius="12dp" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
@@ -128,7 +113,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="Postingan Saya"
+        android:text="Postingan Pengguna"
         android:textColor="#333333"
         android:textSize="16sp"
         android:textStyle="bold"

@@ -10,6 +10,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.ratu.resep_in.R
 import com.ratu.resep_in.adapter.SavedRecipeAdapter
 import com.ratu.resep_in.model.Recipe
+import android.content.Intent
+
 
 class SavedFragment : Fragment(R.layout.fragment_saved) {
 
@@ -26,6 +28,9 @@ class SavedFragment : Fragment(R.layout.fragment_saved) {
         rvSaved.layoutManager = GridLayoutManager(requireContext(), 2)
 
         savedRecipeAdapter = SavedRecipeAdapter(recipeList) { selectedRecipe ->
+            val intent = Intent(requireContext(), com.ratu.resep_in.DetailRecipeActivity::class.java)
+            intent.putExtra("RECIPE_ID", selectedRecipe.id)
+            startActivity(intent)
         }
         rvSaved.adapter = savedRecipeAdapter
 
@@ -69,4 +74,5 @@ class SavedFragment : Fragment(R.layout.fragment_saved) {
                 android.util.Log.e("SAVED", "Gagal fetch favorites: ${e.message}")
             }
     }
+
 }

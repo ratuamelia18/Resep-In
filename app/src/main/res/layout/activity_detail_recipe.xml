@@ -181,11 +181,12 @@
             </androidx.cardview.widget.CardView>
 
             <TextView
+                android:id="@+id/tvCommentCountTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
-                android:text="Komentar Pengguna"
+                android:text="Komentar Pengguna (0)"
                 android:textColor="#333333"
                 android:textStyle="bold" />
 

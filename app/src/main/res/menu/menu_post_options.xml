@@ -6,4 +6,8 @@
     <item
         android:id="@+id/action_delete"
         android:title="Hapus" />
+    <!-- Tambahkan item ini di res/menu/menu_post_options.xml -->
+    <item
+        android:id="@+id/action_archive"
+        android:title="Arsip" />
 </menu>

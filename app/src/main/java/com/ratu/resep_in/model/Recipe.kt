@@ -40,5 +40,9 @@ data class Recipe(
     var duration: Int = 0,
 
     @get:PropertyName("__IGNORE__") @set:PropertyName("__IGNORE__")
-    var timestamp: Long = 0L
+    var timestamp: Long = 0L,
+
+    @get:PropertyName("isArchived") @set:PropertyName("isArchived")
+    var isArchived: Boolean? = false
+
 ) : Serializable

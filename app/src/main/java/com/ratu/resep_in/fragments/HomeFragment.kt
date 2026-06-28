@@ -35,6 +35,8 @@ class HomeFragment : Fragment() {
     private lateinit var rvLatest: RecyclerView
     private lateinit var searchBarHome: View
 
+    private lateinit var tvSeeAllRecomdasi: TextView
+
 
     private lateinit var recommendationAdapter: RecommendationAdapter
     private lateinit var categoryAdapter: HomeCategoryAdapter
@@ -51,6 +53,7 @@ class HomeFragment : Fragment() {
         rvHomeCategory = view.findViewById(R.id.rvHomeCategory)
         rvLatest = view.findViewById(R.id.rvLatest)
         searchBarHome = view.findViewById(R.id.etSearch)
+        tvSeeAllRecomdasi = view.findViewById(R.id.tvSeeAllRekomendasi)
 
         rvRecommendation.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         rvHomeCategory.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -58,6 +61,12 @@ class HomeFragment : Fragment() {
 
         recommendationAdapter = RecommendationAdapter(mutableListOf()) { navigateToDetail(it) }
         rvRecommendation.adapter = recommendationAdapter
+
+        tvSeeAllRecomdasi.setOnClickListener {
+            val intent = Intent(requireContext(), SearchActivity::class.java)
+            startActivity(intent)
+        }
+
 
         latestAdapter = RecipeAdapter(
             recipeList = mutableListOf(),
@@ -127,26 +136,26 @@ class HomeFragment : Fragment() {
             return
         }
 
-        if (!currentUser.displayName.isNullOrEmpty()) {
-            tvGreeting.text = "Halo, ${currentUser.displayName}!"
-            return
-        }
+        db.collection("users").document(currentUser.uid)
+            .addSnapshotListener { document, error ->
+                if (error != null) {
+                    val emailName = currentUser.email?.substringBefore("@") ?: "User"
+                    tvGreeting.text = "Halo, $emailName!"
+                    return@addSnapshotListener
+                }
 
-        db.collection("users").document(currentUser.uid).get()
-            .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
-                    val name = document.getString("nama")
-                        ?: document.getString("username")
+                    val name = document.getString("username")
+                        ?: document.getString("nama")
                         ?: document.getString("name")
+                        ?: currentUser.displayName
                         ?: currentUser.email?.substringBefore("@")
                         ?: "User"
+
                     tvGreeting.text = "Halo, $name!"
                 } else {
                     tvGreeting.text = "Halo, User!"
                 }
-            }
-            .addOnFailureListener {
-                tvGreeting.text = "Halo, User!"
             }
     }
 
