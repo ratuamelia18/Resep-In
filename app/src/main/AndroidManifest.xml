@@ -13,10 +13,9 @@
     <application
         android:name=".AppController"
         android:allowBackup="true"
-        android:icon="@android:drawable/ic_menu_gallery"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="ResepIn"
-        android:roundIcon="@android:drawable/ic_menu_gallery"
-        android:supportsRtl="true"
         android:theme="@style/Theme.ResepIn"
         android:usesCleartextTraffic="true">
 
@@ -48,6 +47,8 @@
         <activity android:name=".FollowListActivity"/>
         <activity android:name=".SettingsActivity"/>
         <activity android:name=".ArsipActivity"/>
+
+
 
 
 
