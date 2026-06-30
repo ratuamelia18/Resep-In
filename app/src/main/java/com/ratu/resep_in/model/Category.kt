@@ -1,5 +1,8 @@
 package com.ratu.resep_in.model
 
 data class Category(
-    val name: String
+    val id: String = "",
+    val name: String = "",
+    val imgurl: String = "",
+    var isSelected: Boolean = false
 )
