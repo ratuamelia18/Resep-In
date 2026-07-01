@@ -2,6 +2,7 @@ package com.ratu.resep_in.model
 
 import com.google.firebase.firestore.PropertyName
 import java.io.Serializable
+import com.google.firebase.firestore.Exclude
 
 data class Recipe(
     var id: String = "",
@@ -43,6 +44,8 @@ data class Recipe(
     var timestamp: Long = 0L,
 
     @get:PropertyName("isArchived") @set:PropertyName("isArchived")
-    var isArchived: Boolean? = false
+    var isArchived: Boolean? = false,
 
+    @get:Exclude
+    var isSaved: Boolean = false
 ) : Serializable
