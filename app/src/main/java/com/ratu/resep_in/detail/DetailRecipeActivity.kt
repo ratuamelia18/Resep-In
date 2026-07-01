@@ -43,6 +43,8 @@ class DetailRecipeActivity : AppCompatActivity() {
     private var player: ExoPlayer? = null
     private var currentRecipe: Recipe? = null
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail_recipe)

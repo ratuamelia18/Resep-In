@@ -65,6 +65,7 @@
                     android:layout_height="match_parent"
                     app:show_buffering="when_playing"
                     app:use_controller="true" />
+
             </FrameLayout>
 
             <com.google.android.material.tabs.TabLayout
