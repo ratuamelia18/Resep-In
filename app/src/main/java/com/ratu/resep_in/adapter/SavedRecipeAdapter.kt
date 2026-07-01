@@ -32,8 +32,6 @@ class SavedRecipeAdapter(
 
     override fun onBindViewHolder(holder: SavedViewHolder, position: Int) {
         val recipe = recipeList[position]
-        val currentUid = FirebaseAuth.getInstance().currentUser?.uid
-        val db = FirebaseFirestore.getInstance()
 
         holder.tvTitle.text = recipe.title
         holder.tvCategoryName.text = recipe.category

@@ -20,7 +20,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".ui.theme.WelcomeActivity"
+            android:name=".main.WelcomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,24 +29,24 @@
         </activity>
 
         <activity
-            android:name=".MainActivity"
+            android:name=".main.MainActivity"
             android:exported="false" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".ui.theme.RegisterActivity" />
-        <activity android:name=".ui.theme.PreferenceActivity" />
+        <activity android:name=".auth.LoginActivity" />
+        <activity android:name=".auth.RegisterActivity" />
+        <activity android:name=".profile.PreferenceActivity" />
         <activity
-            android:name=".ui.theme.SearchActivity"
+            android:name=".main.SearchActivity"
             android:exported="false" />
-        <activity android:name=".UploadActivity" />
-        <activity android:name=".DetailRecipeActivity"
+        <activity android:name=".main.UploadActivity" />
+        <activity android:name=".detail.DetailRecipeActivity"
             android:exported="false" />
-        <activity android:name=".EditRecipeActivity" />
-        <activity android:name=".DetailCategoryActivity" />
-        <activity android:name=".EditProfileActivity" />
-        <activity android:name=".ui.theme.OtherProfileActivity" />
-        <activity android:name=".FollowListActivity"/>
-        <activity android:name=".SettingsActivity"/>
-        <activity android:name=".ArsipActivity"/>
+        <activity android:name=".main.EditRecipeActivity" />
+        <activity android:name=".detail.DetailCategoryActivity" />
+        <activity android:name=".profile.EditProfileActivity" />
+        <activity android:name=".profile.OtherProfileActivity" />
+        <activity android:name=".profile.FollowListActivity"/>
+        <activity android:name=".profile.SettingsActivity"/>
+        <activity android:name=".profile.ArsipActivity"/>
 
 
 

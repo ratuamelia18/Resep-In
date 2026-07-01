@@ -18,7 +18,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.ratu.resep_in.*
 import com.ratu.resep_in.adapter.PostAdapter
 import com.ratu.resep_in.databinding.FragmentProfileBinding
+import com.ratu.resep_in.detail.DetailRecipeActivity
+import com.ratu.resep_in.main.EditRecipeActivity
 import com.ratu.resep_in.model.Recipe
+import com.ratu.resep_in.profile.EditProfileActivity
+import com.ratu.resep_in.profile.FollowListActivity
+import com.ratu.resep_in.profile.SettingsActivity
 import kotlin.math.sqrt
 
 class ProfileFragment : Fragment(R.layout.fragment_profile), SensorEventListener {
