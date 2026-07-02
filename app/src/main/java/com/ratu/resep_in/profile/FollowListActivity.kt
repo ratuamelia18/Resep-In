@@ -39,7 +39,7 @@ class FollowListActivity : AppCompatActivity() {
 
         rvUsers.adapter = userAdapter
 
-        if (type == "Followers") loadFollowers(targetUserId) else loadFollowing(targetUserId)
+        if (type == "FOLLOWERS") loadFollowers(targetUserId) else loadFollowing(targetUserId)
     }
 
     private fun loadFollowers(userId: String) {
